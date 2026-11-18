@@ -29,7 +29,8 @@ const COL = { phone: 5, zip: 10, status: 3 };   // ตำแหน่งคอ�
 
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
-    .setTitle('BEN103 Jersey — พรีออเดอร์')
+    .setTitle('BEN103 Jersey - Pre-Order')
+    .setFaviconUrl('https://superwitsan10-beep.github.io/ben103-jersey/img/favicon-32.png')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
