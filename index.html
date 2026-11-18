@@ -563,7 +563,7 @@ body.loading{overflow:hidden}
   // ===== BACKEND (Google Sheets ผ่าน Apps Script) =====
   // เปิดผ่าน Apps Script Web App โดยตรง: ไม่ต้องแก้อะไร
   // วางบน GitHub Pages / เว็บอื่น: ใส่ URL ของ Web App (ลงท้ายด้วย /exec)
-  var API_URL = '';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxsn2WMAwUCn4zaByZhkbq1ARttkZxEde1PX0Od8mtsDW5m1JZHwbXWD4OHsk2d4xfE/exec';
   var HAS_GAS = !!(window.google && google.script && google.script.run);
   var LIVE = HAS_GAS || !!API_URL;
   function api(action, payload){
