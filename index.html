@@ -471,7 +471,7 @@ body.loading{overflow:hidden}
             <label class="drop" id="drop">
               <input type="file" id="fSlip" accept="image/*">
               <span id="slipThumb"></span>
-              <span><strong id="slipTitle">อัปโหลดสลิป *</strong><span id="slipSub">ลากไฟล์มาวาง หรือคลิกเลือก · JPG/PNG</span></span>
+              <span><strong id="slipTitle">อัปโหลดสลิป *</strong><span id="slipSub">ลากไฟล์มาวาง หรือคลิกเลือก · JPG/PNG ไม่เกิน 15MB</span></span>
             </label>
           </div>
           <span class="err" id="eSlip"></span>
@@ -710,7 +710,7 @@ body.loading{overflow:hidden}
   function setSlip(f){
     if (!f) return;
     if (!/^image\//.test(f.type)) { toast('กรุณาเลือกไฟล์รูปภาพ'); return; }
-    if (f.size > 5*1024*1024) { toast('ไฟล์ใหญ่เกิน 5MB'); return; }
+    if (f.size > 15*1024*1024) { toast('ไฟล์ใหญ่เกิน 15MB'); return; }
     S.slip = f.name; S.slipFile = f;
     $('slipThumb').innerHTML = '<img alt="ตัวอย่างสลิป" src="'+URL.createObjectURL(f)+'">';
     $('slipTitle').textContent = 'แนบสลิปแล้ว ✓';
@@ -801,7 +801,7 @@ body.loading{overflow:hidden}
   });
   $('mClose').addEventListener('click', function(){
     closeModal(); S.items = [newItem()]; S.active = S.items[0].id; S.slip = null; S.slipFile = null;
-    $('fSlip').value=''; $('slipThumb').innerHTML = UPLOAD_ICON; $('slipTitle').textContent = 'อัปโหลดสลิป *'; $('slipSub').textContent = 'ลากไฟล์มาวาง หรือคลิกเลือก · JPG/PNG';
+    $('fSlip').value=''; $('slipThumb').innerHTML = UPLOAD_ICON; $('slipTitle').textContent = 'อัปโหลดสลิป *'; $('slipSub').textContent = 'ลากไฟล์มาวาง หรือคลิกเลือก · JPG/PNG ไม่เกิน 15MB';
     renderItems(); render(); $('order').scrollIntoView({behavior:'smooth'});
   });
   $('mTrack').addEventListener('click', function(){ closeModal(); showTrack($('tPhone').value); $('track').scrollIntoView({behavior:'smooth'}); });

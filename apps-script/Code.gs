@@ -191,7 +191,7 @@ function saveSlip_(dataUrl, name) {
   const m = /^data:(image\/[\w.+-]+);base64,(.+)$/.exec(dataUrl || '');
   if (!m) throw new Error('ไฟล์สลิปต้องเป็นรูปภาพ');
   const bytes = Utilities.base64Decode(m[2]);
-  if (bytes.length > 8 * 1024 * 1024) throw new Error('ไฟล์สลิปใหญ่เกินไป');
+  if (bytes.length > 15 * 1024 * 1024) throw new Error('ไฟล์สลิปใหญ่เกิน 15MB');
   const ext = (m[1].split('/')[1] || 'jpg').replace('jpeg', 'jpg');
   return slipFolder_().createFile(Utilities.newBlob(bytes, m[1], name + '.' + ext));
 }
