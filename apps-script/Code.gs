@@ -132,7 +132,7 @@ function submitOrder(p) {
     const start = items.getLastRow() + 1;
     items.getRange(start, 5, qty, 1).setNumberFormat('@');
     items.getRange(start, 1, qty, 6).setValues(d.items.map(function (x, i) {
-      return [id, i + 1, x.size, x.name, x.num,
+      return [id, i + 1, x.size, safe_(x.name), x.num,
         '=IFERROR(INDEX(Orders!C:C,MATCH(A' + (start + i) + ',Orders!B:B,0)),"")'];
     }));
     SpreadsheetApp.flush();
@@ -159,7 +159,7 @@ function validate_(p) {
     if (SIZES.indexOf(size) < 0) throw new Error('ไซซ์ไม่ถูกต้อง');
     return {
       size: size,
-      name: s(x.name).toUpperCase().replace(/[^A-Z .]/g, '').slice(0, CONFIG.NAME_MAX),
+      name: cleanName_(x && x.name),
       num: s(x.num).replace(/\D/g, '').slice(0, 3),
     };
   });
@@ -180,6 +180,20 @@ function validate_(p) {
 
   if (!p.slip) throw new Error('กรุณาแนบสลิปการโอน');
   return { full: full, phone: phone, items: items, del: del, addr: addr, slip: String(p.slip) };
+}
+
+// ชื่อสกรีน: ไทย อังกฤษ ตัวเลข สัญลักษณ์ (ตัด emoji/อักขระควบคุม) นับความยาวไม่รวมสระบน-ล่าง/วรรณยุกต์ไทย
+function cleanName_(v) {
+  v = String(v == null ? '' : v).replace(/[\u0000-\u001F\u007F-\u009F\uD800-\uDFFF️​-‏]/g, '').replace(/\s{2,}/g, ' ').trim().toUpperCase();
+  const mark = /[ัิ-ฺ็-๎]/;
+  let out = '', n = 0;
+  for (let i = 0; i < v.length; i++) {
+    const m = mark.test(v[i]);
+    if (!m && n >= CONFIG.NAME_MAX) break;
+    if (!m) n++;
+    out += v[i];
+  }
+  return out;
 }
 
 // กันข้อความที่ขึ้นต้นด้วย = + - @ ไม่ให้กลายเป็นสูตรในชีต

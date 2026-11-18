@@ -12,7 +12,7 @@
 :root{
   --cream:#ffeeaa; --cream-2:#fff7d6; --paper:#fffbea; --green:#135e43; --green-2:#0f4d37; --ink:#0a2f22; --red:#9d2328; --red-2:#861c21;
   --line:rgba(19,94,67,.16); --line-2:rgba(19,94,67,.3);
-  --display:'Anton',sans-serif; --head:'Prompt',sans-serif; --body:'Prompt',system-ui,sans-serif; --kit:'BEN Kit','Cinzel',serif;
+  --display:'Anton',sans-serif; --head:'Prompt',sans-serif; --body:'Prompt',system-ui,sans-serif; --kit:'BEN Kit','Prompt','Cinzel',serif;
   --r-xl:36px; --r-lg:24px;
   --glass:rgba(255,250,232,.56); --glass-hi:rgba(255,255,255,.6); --glass-bd:rgba(255,255,255,.55);
   --blur:blur(22px) saturate(1.6);
@@ -555,6 +555,16 @@ document.querySelectorAll('img[data-img]').forEach(function(i){ i.src = __IMG[i.
   var PRICE = 399;
   var SHIP = 50;
   var NAME_MAX = 20;
+  // ชื่อสกรีน: ไทย อังกฤษ ตัวเลข และสัญลักษณ์ได้ (ตัด emoji/อักขระควบคุมออก)
+  // นับความยาวแบบ "ช่องตัวอักษร" — สระบน/ล่างและวรรณยุกต์ไทยไม่นับ
+  var THAI_MARK = /[ัิ-ฺ็-๎]/;
+  function nameLen(v){ var n = 0; for (var i=0;i<v.length;i++) if (!THAI_MARK.test(v[i])) n++; return n; }
+  function cleanName(v){
+    v = String(v||'').replace(/[\u0000-\u001F\u007F-\u009F\uD800-\uDFFF️​-‏]/g,'').replace(/\s{2,}/g,' ').toUpperCase();
+    var out = '', n = 0;
+    for (var i=0;i<v.length;i++){ var mark = THAI_MARK.test(v[i]); if (!mark && n >= NAME_MAX) break; if (!mark) n++; out += v[i]; }
+    return out;
+  }
   var SIZES = [
     ['SS',34,26],['S',36,26],['M',38,27],['L',40,28],['XL',42,29],['2XL',44,30],
     ['3XL',46,30],['4XL',48,31],['5XL',50,31.5],['6XL',52,31.5],['7XL',54,31.5],['8XL',56,31.5]
@@ -643,7 +653,7 @@ document.querySelectorAll('img[data-img]').forEach(function(i){ i.src = __IMG[i.
       + '</div></div>'
       + '<div class="pills s" role="group" aria-label="ไซซ์ตัวที่ '+n+'">'+sizes+'</div>'
       + '<div class="grid3">'
-      + '<label class="fld">ชื่อสกรีน (A–Z)<input data-f="name" maxlength="'+NAME_MAX+'" placeholder="PLAYERNAME" autocomplete="off" value="'+esc(it.name)+'"></label>'
+      + '<label class="fld">ชื่อสกรีน (ไทย / อังกฤษ / สัญลักษณ์ ไม่เกิน '+NAME_MAX+' ตัว)<input data-f="name" placeholder="PLAYERNAME หรือ ชื่อไทย" autocomplete="off" value="'+esc(it.name)+'"></label>'
       + '<label class="fld">เบอร์ (0–999)<input data-f="num" inputmode="numeric" maxlength="3" placeholder="10" autocomplete="off" value="'+esc(it.num)+'"></label>'
       + '</div></div>';
   }
@@ -675,7 +685,7 @@ document.querySelectorAll('img[data-img]').forEach(function(i){ i.src = __IMG[i.
   $('items').addEventListener('input', function(e){
     var f = e.target.dataset.f; if (!f) return;
     var it = S.items[idx(+e.target.closest('.item').dataset.id)];
-    var v = f==='name' ? e.target.value.toUpperCase().replace(/[^A-Z .]/g,'').slice(0,NAME_MAX) : e.target.value.replace(/\D/g,'').slice(0,3);
+    var v = f==='name' ? cleanName(e.target.value) : e.target.value.replace(/\D/g,'').slice(0,3);
     if (e.target.value !== v) e.target.value = v;
     it[f] = v; S.view = 'back'; render();
   });
@@ -697,7 +707,7 @@ document.querySelectorAll('img[data-img]').forEach(function(i){ i.src = __IMG[i.
     $('faceBack').hidden = S.view !== 'back';
     var nm = it.name || 'YOUR NAME', nu = it.num || '10';
     $('pName').textContent = nm; $('pNum').textContent = nu;
-    $('pName').style.fontSize = (nm.length > 9 ? 5.4*9/nm.length : 5.4) + 'cqw';
+    var nl = nameLen(nm); $('pName').style.fontSize = (nl > 9 ? 5.4*9/nl : 5.4) + 'cqw';
     $('pNum').style.fontSize = (nu.length > 2 ? 21 : 30) + 'cqw';
     $('pAlt').textContent = S.view==='back' ? 'ตัวอย่างหลังเสื้อตัวที่ '+n+' ชื่อ '+nm+' เบอร์ '+nu : 'ตัวอย่างด้านหน้าเสื้อ';
     $('mWhich').textContent = 'ตัวที่ ' + n; $('mSize').textContent = it.size; $('mQty').textContent = q + ' ตัว';
@@ -766,7 +776,7 @@ document.querySelectorAll('img[data-img]').forEach(function(i){ i.src = __IMG[i.
 
     var ship = S.del==='ship' ? SHIP : 0;
     var p = {
-      items: S.items.map(function(it){ return { size:it.size, name:it.name, num:it.num }; }),
+      items: S.items.map(function(it){ return { size:it.size, name:it.name.trim(), num:it.num }; }),
       full: full, phone: phone, del: S.del,
       addr: S.del==='ship' ? { line:addr, district:dist, province:prov, zip:zip } : null
     };
