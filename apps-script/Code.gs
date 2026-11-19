@@ -22,9 +22,10 @@ const CONFIG = {
 
 const SIZES = ['SS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
 const STATUSES = ['รอตรวจสลิป', 'ยืนยันแล้ว', 'กำลังผลิต', 'พร้อมรับ/จัดส่ง', 'ยกเลิก'];
-const ORDER_HEADERS = ['เวลาสั่ง', 'เลขออเดอร์', 'สถานะ', 'ชื่อ-นามสกุล', 'เบอร์โทร', 'การรับ', 'ที่อยู่', 'อำเภอ/เขต', 'จังหวัด', 'รหัสไปรษณีย์', 'จำนวน (ตัว)', 'รายการเสื้อ', 'ค่าเสื้อ', 'ค่าส่ง', 'ยอดรวม', 'สลิป', 'หมายเหตุ'];
+const ORDER_HEADERS = ['เวลาสั่ง', 'เลขออเดอร์', 'สถานะ', 'ชื่อ-นามสกุล', 'เบอร์โทร', 'การรับ', 'ที่อยู่', 'อำเภอ/เขต', 'จังหวัด', 'รหัสไปรษณีย์', 'จำนวน (ตัว)', 'รายการเสื้อ', 'ค่าเสื้อ', 'ค่าส่ง', 'ยอดรวม', 'สลิป', 'หมายเหตุ', 'PLAYER (ตัว)', 'GOALKEEPER (ตัว)'];
 const ITEM_HEADERS = ['เลขออเดอร์', 'ตัวที่', 'ไซซ์', 'ชื่อสกรีน', 'เบอร์', 'สถานะออเดอร์', 'แบบ'];
-const KITS = { player: 'ผู้เล่น', gk: 'GK' };
+const KITS = { player: 'PLAYER', gk: 'GOALKEEPER' };
+function isGk_(v) { return v === 'GOALKEEPER' || v === 'GK'; }
 function kitPrice_(k) { return k === 'gk' ? CONFIG.PRICE_GK : CONFIG.PRICE; }
 const COL = { phone: 5, zip: 10, status: 3 };   // ตำแหน่งคอลัมน์ในชีต Orders (เริ่มที่ 1)
 
@@ -67,6 +68,7 @@ function setup() {
   orders.getRange(1, COL.zip, orders.getMaxRows(), 1).setNumberFormat('@');
   items.getRange(1, 5, items.getMaxRows(), 1).setNumberFormat('@');
   ensureHeaders_(items, ITEM_HEADERS);
+  ensureHeaders_(orders, ORDER_HEADERS);
   orders.getRange(2, 1, orders.getMaxRows() - 1, 1).setNumberFormat('dd/mm/yyyy hh:mm');
   orders.getRange(2, 13, orders.getMaxRows() - 1, 3).setNumberFormat('#,##0');
 
@@ -78,12 +80,12 @@ function setup() {
   let sum = ss.getSheetByName('Summary') || ss.insertSheet('Summary');
   sum.clear();
   const n = SIZES.length;
-  const rows = [['ไซซ์', 'เสื้อผู้เล่น', 'เสื้อ GK', 'รวม']];
+  const rows = [['ไซซ์', 'PLAYER', 'GOALKEEPER', 'รวม']];
   SIZES.forEach(function (sz, i) {
     const r = i + 2;
     rows.push([sz,
-      '=COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก",Items!G:G,"<>GK")',
-      '=COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก",Items!G:G,"GK")',
+      '=COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก")-C' + r,
+      '=COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก",Items!G:G,"GOALKEEPER")+COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก",Items!G:G,"GK")',
       '=B' + r + '+C' + r]);
   });
   rows.push(['รวมทั้งหมด', '=SUM(B2:B' + (n + 1) + ')', '=SUM(C2:C' + (n + 1) + ')', '=SUM(D2:D' + (n + 1) + ')']);
@@ -128,10 +130,12 @@ function submitOrder(p) {
     try { slip.setName(id + '_' + d.phone + slip.getName().replace(/^.*(\.\w+)$/, '$1')); } catch (e) {}
 
     const qty = d.items.length;
+    const nGk = d.items.filter(function (x) { return x.kit === 'gk'; }).length;
+    const nPlayer = qty - nGk;
     const sub = d.items.reduce(function (t, x) { return t + kitPrice_(x.kit); }, 0);
     const ship = d.del === 'ship' ? CONFIG.SHIP : 0;
     const total = sub + ship;
-    const list = d.items.map(function (x, i) { return '#' + (i + 1) + (x.kit === 'gk' ? ' GK' : '') + ' ' + x.size + ' · ' + (x.name || '-') + ' · ' + (x.num || '-'); }).join('\n');
+    const list = d.items.map(function (x, i) { return '#' + (i + 1) + ' ' + KITS[x.kit] + ' · ' + x.size + ' · ' + (x.name || '-') + ' · ' + (x.num || '-'); }).join('\n');
 
     const row = orders.getLastRow() + 1;
     orders.getRange(row, COL.phone).setNumberFormat('@');
@@ -140,16 +144,22 @@ function submitOrder(p) {
       new Date(), id, STATUSES[0], safe_(d.full), d.phone,
       d.del === 'ship' ? 'จัดส่ง' : 'รับที่งาน',
       safe_(d.addr.line), safe_(d.addr.district), safe_(d.addr.province), d.addr.zip,
-      qty, list, sub, ship, total, slip.getUrl(), ''
+      qty, list, sub, ship, total, slip.getUrl(), '', nPlayer, nGk
     ]]);
 
     ensureHeaders_(items, ITEM_HEADERS);
+    ensureHeaders_(orders, ORDER_HEADERS);
     const start = items.getLastRow() + 1;
     items.getRange(start, 5, qty, 1).setNumberFormat('@');
     items.getRange(start, 1, qty, 7).setValues(d.items.map(function (x, i) {
       return [id, i + 1, x.size, safe_(x.name), x.num,
         '=IFERROR(INDEX(Orders!C:C,MATCH(A' + (start + i) + ',Orders!B:B,0)),"")', KITS[x.kit]];
     }));
+    d.items.forEach(function (x, i) {
+      const cell = items.getRange(start + i, 7);
+      if (x.kit === 'gk') cell.setBackground('#0a1a12').setFontColor('#dcc884').setFontWeight('bold');
+      else cell.setBackground('#ffeeaa').setFontColor('#135e43').setFontWeight('bold');
+    });
     SpreadsheetApp.flush();
     return { id: id, total: total, qty: qty };
   } finally {
@@ -252,7 +262,7 @@ function trackOrders(p) {
   const ids = {};
   found.forEach(function (r) { ids[r[1]] = []; });
   const iv = items.getLastRow() > 1 ? items.getRange(2, 1, items.getLastRow() - 1, 7).getValues() : [];
-  iv.forEach(function (r) { if (ids[r[0]]) ids[r[0]].push({ kit: r[6] === 'GK' ? 'gk' : 'player', size: String(r[2]), name: String(r[3]), num: String(r[4]) }); });
+  iv.forEach(function (r) { if (ids[r[0]]) ids[r[0]].push({ kit: isGk_(r[6]) ? 'gk' : 'player', size: String(r[2]), name: String(r[3]), num: String(r[4]) }); });
 
   return found.reverse().map(function (r) {
     const status = String(r[COL.status - 1]);
