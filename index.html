@@ -131,6 +131,10 @@ section.blk{padding:110px 0 0}
 .feat{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
 .feat li{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid rgba(255,238,170,.18);font-size:16px}
 .feat li span{font-family:var(--display);font-size:16px;color:var(--cream);opacity:.6;width:24px}
+.kcard .lab small{font-family:var(--head);font-size:12px;letter-spacing:1.5px;color:#3d5c4f;font-weight:500}
+.kcard.gkinfo{grid-column:span 4;background:rgba(10,20,15,.82);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.2);box-shadow:var(--glass-shadow);color:var(--cream);padding:30px;display:flex;flex-direction:column;justify-content:space-between;gap:20px}
+.kcard.gkinfo h3{margin:0;font-family:var(--head);font-weight:700;font-size:28px;line-height:1.25}
+.kcard.gkinfo .gk-tag{align-self:flex-start;font-family:var(--display);font-size:22px;letter-spacing:2px;padding:6px 14px;border-radius:12px;background:#dcc884;color:#0a1a12}
 .kcard.wide{grid-column:span 12;background:rgba(10,47,34,.82);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border:1px solid rgba(255,255,255,.2);color:var(--cream);padding:28px 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
 .kcard.wide .big{font-family:var(--display);font-size:clamp(40px,5vw,64px);line-height:1;letter-spacing:1px}
 .kcard.wide .big em{font-style:normal;color:var(--cream);opacity:.45}
@@ -164,6 +168,10 @@ legend .free{font-family:var(--body);font-weight:500;font-size:12px;padding:3px 
 legend a{margin-left:auto;font-family:var(--body);font-weight:500;font-size:14px}
 .pills{display:grid;gap:8px}
 .pills.s{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.pills.k{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:5px;border-radius:16px;background:var(--cream)}
+.pills.k .pill{border:0;min-height:44px;border-radius:12px;background:transparent;font-size:15px}
+.pills.k .pill[aria-pressed="true"]{background:var(--green);color:var(--cream)}
+.pills.k .pill[data-kit="gk"][aria-pressed="true"]{background:#0a1a12;color:#dcc884}
 .pills.s .pill{min-height:44px;font-size:15px;border-radius:12px}
 .items{display:flex;flex-direction:column;gap:12px}
 .item{border:1.5px solid rgba(255,255,255,.7);border-radius:20px;background:rgba(255,255,255,.55);padding:16px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,box-shadow .2s;animation:pop .3s ease}
@@ -284,7 +292,7 @@ footer .big{font-family:var(--display);font-size:clamp(110px,19vw,280px);line-he
   .hero-copy{padding:24px}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kcard.front,.kcard.back{grid-column:span 6}
-  .kcard.info{grid-column:span 12}
+  .kcard.info,.kcard.gkinfo{grid-column:span 12}
   .config,.duo{grid-template-columns:1fr}
   .stage{position:relative;top:0}
   .bar{border-radius:24px}
@@ -381,15 +389,15 @@ body.loading{overflow:hidden}
   <div class="wrap">
     <div class="sechead rv">
       <div><span class="eyebrow">The Kit</span><h2 class="h2">หนึ่งตัว หนึ่งรุ่น<br>หนึ่งความทรงจำ</h2></div>
-      <p>ดีไซน์เดียวของรุ่น 103 สีประจำโรงเรียนครบทั้ง เขียว และแดง</p>
+      <p>2 แบบของรุ่น 103 · เสื้อผู้เล่น และเสื้อผู้รักษาประตู (GOALKEEPER)</p>
     </div>
     <div class="kit">
       <article class="kcard front rv">
-        <div class="lab">FRONT<b>01</b></div>
+        <div class="lab"><span>FRONT <small>· PLAYER</small></span><b>01</b></div>
         <img src="img/front.webp" alt="เสื้อด้านหน้า" loading="lazy">
       </article>
       <article class="kcard back rv">
-        <div class="lab">BACK<b>02</b></div>
+        <div class="lab"><span>BACK <small>· PLAYER</small></span><b>02</b></div>
         <img src="img/back.webp" alt="เสื้อด้านหลัง สกรีน PLAYERNAME เบอร์ 10" loading="lazy">
       </article>
       <article class="kcard info rv">
@@ -404,6 +412,28 @@ body.loading{overflow:hidden}
             <li><span>05</span>สกรีนชื่อ + เบอร์หลังเสื้อ</li>
           </ul>
         </div>
+      </article>
+      <article class="kcard front rv">
+        <div class="lab"><span>FRONT <small>· GOALKEEPER</small></span><b>03</b></div>
+        <img src="img/gk-front.webp" alt="เสื้อผู้รักษาประตู ด้านหน้า สีเขียว แผงข้างสีดำ ตัวอักษร BENCHAMA สีทอง" loading="lazy">
+      </article>
+      <article class="kcard back rv">
+        <div class="lab"><span>BACK <small>· GOALKEEPER</small></span><b>04</b></div>
+        <img src="img/gk-back.webp" alt="เสื้อผู้รักษาประตู ด้านหลัง สกรีน PLAYERNAME เบอร์ 1 สีทอง" loading="lazy">
+      </article>
+      <article class="kcard gkinfo rv">
+        <span class="gk-tag">GOALKEEPER</span>
+        <div>
+          <h3>เสื้อผู้รักษาประตู</h3>
+          <ul class="feat" style="margin-top:14px">
+            <li><span>01</span>ตัวเสื้อเขียวเข้ม แผงข้างสีดำ</li>
+            <li><span>02</span>แถบครีมพาดไหล่และข้างลำตัว</li>
+            <li><span>03</span>ปกโปโลสีครีม</li>
+            <li><span>04</span>ตัวอักษร BENCHAMA สีทอง</li>
+            <li><span>05</span>สกรีนชื่อ + เบอร์สีทอง</li>
+          </ul>
+        </div>
+        <button class="btn btn-cream" type="button" data-pick-kit="gk">เลือกเสื้อ GK →</button>
       </article>
       <article class="kcard wide rv">
         <div class="big">BENCHAMA <em>·</em> 103 <em>·</em> 2026/27</div>
@@ -423,12 +453,12 @@ body.loading{overflow:hidden}
             <button type="button" data-view="front" aria-pressed="false">ด้านหน้า</button>
             <button type="button" data-view="back" aria-pressed="true">ด้านหลัง</button>
           </div>
-          <span class="stage-code">BEN103 · 26/27</span>
+          <span class="stage-code" id="stageCode">PLAYER · 26/27</span>
         </div>
         <div class="preview" id="preview">
-          <div class="face" id="faceFront" hidden><img src="img/front.webp" alt="ตัวอย่างด้านหน้า"></div>
+          <div class="face" id="faceFront" hidden><img id="imgFront" src="img/front.webp" alt="ตัวอย่างด้านหน้า"></div>
           <div class="face" id="faceBack">
-            <img src="img/back-blank.webp" alt="">
+            <img id="imgBack" src="img/back-blank.webp" alt="">
             <div class="pname" id="pName" aria-hidden="true">YOUR NAME</div>
             <div class="pnum" id="pNum" aria-hidden="true">10</div>
           </div>
@@ -537,7 +567,7 @@ body.loading{overflow:hidden}
 (function(){
   // ===== loader =====
   var ld = document.getElementById('loader'), bar = document.getElementById('ldBar'), pct = document.getElementById('ldPct');
-  var srcs = ['img/logo.webp','img/front.webp','img/back.webp','img/back-blank.webp'];
+  var srcs = ['img/logo.webp','img/front.webp','img/back.webp','img/back-blank.webp','img/gk-front.webp','img/gk-back.webp','img/gk-back-blank.webp'];
   var total = srcs.length + 1, loaded = 0, shown = 0, start = Date.now(), finished = false;
   function tick(){ var target = Math.round(loaded/total*100); if (shown < target){ shown += Math.max(1, Math.ceil((target-shown)/6)); bar.style.width = shown+'%'; pct.textContent = shown+'%'; } if (shown < 100) requestAnimationFrame(tick); else finish(); }
   function one(){ loaded = Math.min(total, loaded+1); }
@@ -555,6 +585,12 @@ body.loading{overflow:hidden}
   // ===== CONFIG =====
   var PRICE = 399;
   var SHIP = 50;
+  // แบบเสื้อ (ราคาแยกแต่ละแบบได้)
+  var KITS = {
+    player: { label:'เสื้อผู้เล่น', short:'PLAYER', price:PRICE, front:'img/front.webp', blank:'img/back-blank.webp', ink:'#141414' },
+    gk:     { label:'เสื้อผู้รักษาประตู', short:'GK', price:PRICE, front:'img/gk-front.webp', blank:'img/gk-back-blank.webp', ink:'#dcc884' }
+  };
+  function kitOf(k){ return KITS[k] || KITS.player; }
   var NAME_MAX = 20;
   // ชื่อสกรีน: ไทย อังกฤษ ตัวเลข และสัญลักษณ์ได้ (ตัด emoji/อักขระควบคุมออก)
   // นับความยาวแบบ "ช่องตัวอักษร" — สระบน/ล่างและวรรณยุกต์ไทยไม่นับ
@@ -606,7 +642,8 @@ body.loading{overflow:hidden}
   }
 
   var uid = 0;
-  function newItem(size){ return { id: ++uid, size: size || 'L', name: '', num: '' }; }
+  function newItem(size, kit){ return { id: ++uid, kit: kit || 'player', size: size || 'L', name: '', num: '' }; }
+  function sumItems(list){ return list.reduce(function(t,it){ return t + kitOf(it.kit).price; }, 0); }
   var S = { items:[newItem()], active:1, del:'event', view:'back', slip:null };
   var $ = function(id){ return document.getElementById(id); };
   var fmt = function(n){ return '฿' + n.toLocaleString('th-TH'); };
@@ -647,11 +684,13 @@ body.loading{overflow:hidden}
 
   // ===== items =====
   function itemHTML(it, n){
+    var kits = Object.keys(KITS).map(function(k){ return '<button type="button" class="pill" data-kit="'+k+'" aria-pressed="'+(it.kit===k)+'">'+KITS[k].label+(k==='gk'?' (GK)':'')+'</button>'; }).join('');
     var sizes = SIZES.map(function(s){ return '<button type="button" class="pill" data-size="'+s[0]+'" aria-pressed="'+(it.size===s[0])+'">'+s[0]+'</button>'; }).join('');
     return '<div class="item'+(it.id===S.active?' active':'')+'" data-id="'+it.id+'">'
-      + '<div class="item-h"><b>ตัวที่ '+n+' <i>'+fmt(PRICE)+'</i></b><div class="acts">'
+      + '<div class="item-h"><b>ตัวที่ '+n+' <i>'+fmt(kitOf(it.kit).price)+'</i></b><div class="acts">'
       + (S.items.length>1 ? '<button type="button" class="ibtn del" data-act="del" aria-label="ลบตัวที่ '+n+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>ลบ</button>' : '')
       + '</div></div>'
+      + '<div class="pills k" role="group" aria-label="แบบเสื้อตัวที่ '+n+'">'+kits+'</div>'
       + '<div class="pills s" role="group" aria-label="ไซซ์ตัวที่ '+n+'">'+sizes+'</div>'
       + '<div class="grid3">'
       + '<label class="fld">ชื่อสกรีน<input data-f="name" placeholder="PLAYERNAME หรือ ชื่อไทย" autocomplete="off" value="'+esc(it.name)+'"></label>'
@@ -670,6 +709,12 @@ body.loading{overflow:hidden}
   $('items').addEventListener('click', function(e){
     var card = e.target.closest('.item'); if (!card) return;
     var id = +card.dataset.id, it = S.items[idx(id)];
+    var kb = e.target.closest('[data-kit]');
+    if (kb) {
+      it.kit = kb.dataset.kit;
+      card.querySelectorAll('[data-kit]').forEach(function(b){ b.setAttribute('aria-pressed', String(b === kb)); });
+      card.querySelector('.item-h i').textContent = fmt(kitOf(it.kit).price);
+    }
     var sb = e.target.closest('[data-size]');
     if (sb) {
       it.size = sb.dataset.size;
@@ -691,7 +736,7 @@ body.loading{overflow:hidden}
     it[f] = v; S.view = 'back'; render();
   });
   $('addItem').addEventListener('click', function(){
-    var it = newItem(cur().size); S.items.push(it); S.active = it.id;
+    var it = newItem(cur().size, cur().kit); S.items.push(it); S.active = it.id;
     renderItems(); render();
     var el = $('items').querySelector('[data-id="'+it.id+'"] input'); if (el) el.focus();
   });
@@ -706,19 +751,28 @@ body.loading{overflow:hidden}
     document.querySelectorAll('[data-view]').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.view === S.view)); });
     $('faceFront').hidden = S.view !== 'front';
     $('faceBack').hidden = S.view !== 'back';
+    var kit = kitOf(it.kit);
+    if ($('imgFront').getAttribute('src') !== kit.front) $('imgFront').setAttribute('src', kit.front);
+    if ($('imgBack').getAttribute('src') !== kit.blank) $('imgBack').setAttribute('src', kit.blank);
+    $('pName').style.color = kit.ink; $('pNum').style.color = kit.ink;
+    $('stageCode').textContent = kit.short + ' · 26/27';
     var nm = it.name || 'YOUR NAME', nu = it.num || '10';
     $('pName').textContent = nm; $('pNum').textContent = nu;
     var nl = nameLen(nm); $('pName').style.fontSize = (nl > 9 ? 5.4*9/nl : 5.4) + 'cqw';
     $('pNum').style.fontSize = (nu.length > 2 ? 21 : 30) + 'cqw';
-    $('pAlt').textContent = S.view==='back' ? 'ตัวอย่างหลังเสื้อตัวที่ '+n+' ชื่อ '+nm+' เบอร์ '+nu : 'ตัวอย่างด้านหน้าเสื้อ';
-    $('mWhich').textContent = 'ตัวที่ ' + n; $('mSize').textContent = it.size; $('mQty').textContent = q + ' ตัว';
+    $('pAlt').textContent = S.view==='back' ? 'ตัวอย่างหลัง'+kit.label+' ตัวที่ '+n+' ชื่อ '+nm+' เบอร์ '+nu : 'ตัวอย่างด้านหน้า'+kit.label;
+    $('mWhich').textContent = 'ตัวที่ ' + n + (it.kit==='gk' ? ' · GK' : ''); $('mSize').textContent = it.size; $('mQty').textContent = q + ' ตัว';
     $('addrWrap').hidden = S.del !== 'ship';
     var ship = S.del==='ship' ? SHIP : 0;
-    $('total').textContent = fmt(PRICE*q + ship);
+    $('total').textContent = fmt(sumItems(S.items) + ship);
     $('barSub').textContent = 'ยอดรวม · เสื้อ ' + q + ' ตัว' + (ship ? ' + ค่าส่ง' : '');
   }
 
   document.querySelectorAll('[data-view]').forEach(function(b){ b.addEventListener('click', function(){ S.view = b.dataset.view; render(); }); });
+  document.querySelectorAll('[data-pick-kit]').forEach(function(b){ b.addEventListener('click', function(){
+    var it = cur(); it.kit = b.dataset.pickKit; S.view = 'front'; renderItems(); render();
+    $('order').scrollIntoView({behavior:'smooth'});
+  }); });
   $('fZip').addEventListener('input', function(e){ e.target.value = e.target.value.replace(/\D/g,'').slice(0,5); });
 
   // slip upload
@@ -750,7 +804,7 @@ body.loading{overflow:hidden}
   function showDone(id, total, p){
     $('mId').textContent = id;
     var rows = [['ชื่อผู้สั่ง', p.full]];
-    p.items.forEach(function(it,i){ rows.push(['ตัวที่ '+(i+1), it.size+' · '+(it.name||'—')+' #'+(it.num||'—')]); });
+    p.items.forEach(function(it,i){ rows.push(['ตัวที่ '+(i+1), (it.kit==='gk'?'GK · ':'')+it.size+' · '+(it.name||'—')+' #'+(it.num||'—')]); });
     rows.push(['การรับ', p.del==='ship' ? 'จัดส่ง · '+p.addr.province+' '+p.addr.zip : 'รับที่งาน']);
     rows.push(['ยอดชำระ', fmt(total)]);
     $('mSum').innerHTML = rows.map(function(r){ return '<div><span>'+r[0]+'</span><b>'+esc(r[1])+'</b></div>'; }).join('');
@@ -777,7 +831,7 @@ body.loading{overflow:hidden}
 
     var ship = S.del==='ship' ? SHIP : 0;
     var p = {
-      items: S.items.map(function(it){ return { size:it.size, name:it.name.trim(), num:it.num }; }),
+      items: S.items.map(function(it){ return { kit:it.kit, size:it.size, name:it.name.trim(), num:it.num }; }),
       full: full, phone: phone, del: S.del,
       addr: S.del==='ship' ? { line:addr, district:dist, province:prov, zip:zip } : null
     };
@@ -794,7 +848,7 @@ body.loading{overflow:hidden}
     // โหมด demo: เก็บในเบราว์เซอร์
     var list = loadOrders();
     var id = 'BEN103-' + String(list.length + 1).padStart(4,'0');
-    var order = { id:id, items:p.items, phone:phone, total:PRICE*p.items.length+ship, step:0, status:'รอตรวจสลิป' };
+    var order = { id:id, items:p.items, phone:phone, total:sumItems(p.items)+ship, step:0, status:'รอตรวจสลิป' };
     list.unshift(order); saveOrders(list);
     showDone(id, order.total, p);
   });
@@ -830,7 +884,7 @@ body.loading{overflow:hidden}
       var step = typeof o.step === 'number' ? o.step : (STATUS_STEP[o.status] || 0);
       var bars = STEPS.map(function(_,i){ return '<i class="'+(!cancelled && i<=step?'on':'')+'"></i>'; }).join('');
       var labels = STEPS.map(function(s,i){ return '<span class="'+(!cancelled && i===step?'on':'')+'">'+s+'</span>'; }).join('');
-      var its = (o.items||[]).map(function(it){ return it.size+' '+(it.name||'—')+' #'+(it.num||'—'); }).join(' · ');
+      var its = (o.items||[]).map(function(it){ return (it.kit==='gk'?'GK ':'')+it.size+' '+(it.name||'—')+' #'+(it.num||'—'); }).join(' · ');
       return '<div class="ocard"><header><b>'+esc(o.id)+'</b><span style="font-size:14px">'+(o.items||[]).length+' ตัว · '+fmt(Number(o.total)||0)+'</span></header>'
         + '<div style="font-size:14px">'+esc(its)+'</div>'
         + (cancelled ? '<div style="font-weight:600;color:var(--red)">ออเดอร์นี้ถูกยกเลิก</div>' : '<div class="prog">'+bars+'</div><div class="pl">'+labels+'</div>')

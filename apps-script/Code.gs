@@ -10,7 +10,8 @@
 
 const CONFIG = {
   SHEET_ID: '',                              // ว่างไว้ถ้าสร้างสคริปต์จากใน Google Sheet (ส่วนขยาย > Apps Script)
-  PRICE: 399,                                // ราคาต่อตัว
+  PRICE: 399,                                // ราคาต่อตัว (เสื้อผู้เล่น)
+  PRICE_GK: 399,                             // ราคาต่อตัว (เสื้อผู้รักษาประตู)
   SHIP: 50,                                  // ค่าส่งต่อออเดอร์
   NAME_MAX: 20,                              // ความยาวชื่อสกรีนสูงสุด
   MAX_ITEMS: 50,                             // จำนวนเสื้อสูงสุดต่อออเดอร์
@@ -22,7 +23,9 @@ const CONFIG = {
 const SIZES = ['SS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL'];
 const STATUSES = ['รอตรวจสลิป', 'ยืนยันแล้ว', 'กำลังผลิต', 'พร้อมรับ/จัดส่ง', 'ยกเลิก'];
 const ORDER_HEADERS = ['เวลาสั่ง', 'เลขออเดอร์', 'สถานะ', 'ชื่อ-นามสกุล', 'เบอร์โทร', 'การรับ', 'ที่อยู่', 'อำเภอ/เขต', 'จังหวัด', 'รหัสไปรษณีย์', 'จำนวน (ตัว)', 'รายการเสื้อ', 'ค่าเสื้อ', 'ค่าส่ง', 'ยอดรวม', 'สลิป', 'หมายเหตุ'];
-const ITEM_HEADERS = ['เลขออเดอร์', 'ตัวที่', 'ไซซ์', 'ชื่อสกรีน', 'เบอร์', 'สถานะออเดอร์'];
+const ITEM_HEADERS = ['เลขออเดอร์', 'ตัวที่', 'ไซซ์', 'ชื่อสกรีน', 'เบอร์', 'สถานะออเดอร์', 'แบบ'];
+const KITS = { player: 'ผู้เล่น', gk: 'GK' };
+function kitPrice_(k) { return k === 'gk' ? CONFIG.PRICE_GK : CONFIG.PRICE; }
 const COL = { phone: 5, zip: 10, status: 3 };   // ตำแหน่งคอลัมน์ในชีต Orders (เริ่มที่ 1)
 
 /* ====================== เว็บแอป ====================== */
@@ -63,6 +66,7 @@ function setup() {
   orders.getRange(1, COL.phone, orders.getMaxRows(), 1).setNumberFormat('@');
   orders.getRange(1, COL.zip, orders.getMaxRows(), 1).setNumberFormat('@');
   items.getRange(1, 5, items.getMaxRows(), 1).setNumberFormat('@');
+  ensureHeaders_(items, ITEM_HEADERS);
   orders.getRange(2, 1, orders.getMaxRows() - 1, 1).setNumberFormat('dd/mm/yyyy hh:mm');
   orders.getRange(2, 13, orders.getMaxRows() - 1, 3).setNumberFormat('#,##0');
 
@@ -73,17 +77,27 @@ function setup() {
 
   let sum = ss.getSheetByName('Summary') || ss.insertSheet('Summary');
   sum.clear();
-  const rows = [['ไซซ์', 'จำนวนตัว (ไม่รวมยกเลิก)']];
-  SIZES.forEach(function (s) { rows.push([s, '=COUNTIFS(Items!C:C,"' + s + '",Items!F:F,"<>ยกเลิก")']); });
-  rows.push(['รวมทั้งหมด', '=SUM(B2:B' + (SIZES.length + 1) + ')']);
-  rows.push(['', '']);
-  rows.push(['จำนวนออเดอร์', '=COUNTIFS(Orders!B2:B,"<>",Orders!C2:C,"<>ยกเลิก")']);
-  rows.push(['ยอดเงินรวม (บาท)', '=SUMIFS(Orders!O2:O,Orders!C2:C,"<>ยกเลิก")']);
-  rows.push(['ยอดที่ยืนยันแล้ว (บาท)', '=SUMIFS(Orders!O2:O,Orders!C2:C,"<>ยกเลิก",Orders!C2:C,"<>รอตรวจสลิป")']);
-  rows.push(['ออเดอร์รอตรวจสลิป', '=COUNTIF(Orders!C2:C,"รอตรวจสลิป")']);
-  sum.getRange(1, 1, rows.length, 2).setValues(rows);
-  sum.getRange(1, 1, 1, 2).setFontWeight('bold').setBackground('#135e43').setFontColor('#ffeeaa');
-  sum.getRange(SIZES.length + 2, 1, 1, 2).setFontWeight('bold');
+  const n = SIZES.length;
+  const rows = [['ไซซ์', 'เสื้อผู้เล่น', 'เสื้อ GK', 'รวม']];
+  SIZES.forEach(function (sz, i) {
+    const r = i + 2;
+    rows.push([sz,
+      '=COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก",Items!G:G,"<>GK")',
+      '=COUNTIFS(Items!C:C,"' + sz + '",Items!F:F,"<>ยกเลิก",Items!G:G,"GK")',
+      '=B' + r + '+C' + r]);
+  });
+  rows.push(['รวมทั้งหมด', '=SUM(B2:B' + (n + 1) + ')', '=SUM(C2:C' + (n + 1) + ')', '=SUM(D2:D' + (n + 1) + ')']);
+  rows.push(['', '', '', '']);
+  rows.push(['จำนวนออเดอร์', '=COUNTIFS(Orders!B2:B,"<>",Orders!C2:C,"<>ยกเลิก")', '', '']);
+  rows.push(['ยอดเงินรวม (บาท)', '=SUMIFS(Orders!O2:O,Orders!C2:C,"<>ยกเลิก")', '', '']);
+  rows.push(['ยอดที่ยืนยันแล้ว (บาท)', '=SUMIFS(Orders!O2:O,Orders!C2:C,"<>ยกเลิก",Orders!C2:C,"<>รอตรวจสลิป")', '', '']);
+  rows.push(['ออเดอร์รอตรวจสลิป', '=COUNTIF(Orders!C2:C,"รอตรวจสลิป")', '', '']);
+  rows.push(['', '', '', '']);
+  rows.push(['* ไม่นับออเดอร์ที่ยกเลิก', '', '', '']);
+  sum.getRange(1, 1, rows.length, 4).setValues(rows);
+  sum.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#135e43').setFontColor('#ffeeaa');
+  sum.getRange(n + 2, 1, 1, 4).setFontWeight('bold');
+  sum.setColumnWidth(3, 120); sum.setColumnWidth(4, 120);
   sum.setColumnWidth(1, 200); sum.setColumnWidth(2, 200);
 
   slipFolder_();
@@ -114,10 +128,10 @@ function submitOrder(p) {
     try { slip.setName(id + '_' + d.phone + slip.getName().replace(/^.*(\.\w+)$/, '$1')); } catch (e) {}
 
     const qty = d.items.length;
-    const sub = qty * CONFIG.PRICE;
+    const sub = d.items.reduce(function (t, x) { return t + kitPrice_(x.kit); }, 0);
     const ship = d.del === 'ship' ? CONFIG.SHIP : 0;
     const total = sub + ship;
-    const list = d.items.map(function (x, i) { return '#' + (i + 1) + ' ' + x.size + ' · ' + (x.name || '-') + ' · ' + (x.num || '-'); }).join('\n');
+    const list = d.items.map(function (x, i) { return '#' + (i + 1) + (x.kit === 'gk' ? ' GK' : '') + ' ' + x.size + ' · ' + (x.name || '-') + ' · ' + (x.num || '-'); }).join('\n');
 
     const row = orders.getLastRow() + 1;
     orders.getRange(row, COL.phone).setNumberFormat('@');
@@ -129,11 +143,12 @@ function submitOrder(p) {
       qty, list, sub, ship, total, slip.getUrl(), ''
     ]]);
 
+    ensureHeaders_(items, ITEM_HEADERS);
     const start = items.getLastRow() + 1;
     items.getRange(start, 5, qty, 1).setNumberFormat('@');
-    items.getRange(start, 1, qty, 6).setValues(d.items.map(function (x, i) {
+    items.getRange(start, 1, qty, 7).setValues(d.items.map(function (x, i) {
       return [id, i + 1, x.size, safe_(x.name), x.num,
-        '=IFERROR(INDEX(Orders!C:C,MATCH(A' + (start + i) + ',Orders!B:B,0)),"")'];
+        '=IFERROR(INDEX(Orders!C:C,MATCH(A' + (start + i) + ',Orders!B:B,0)),"")', KITS[x.kit]];
     }));
     SpreadsheetApp.flush();
     return { id: id, total: total, qty: qty };
@@ -157,7 +172,9 @@ function validate_(p) {
   const items = raw.map(function (x) {
     const size = s(x && x.size).toUpperCase();
     if (SIZES.indexOf(size) < 0) throw new Error('ไซซ์ไม่ถูกต้อง');
+    const kit = (x && x.kit) === 'gk' ? 'gk' : 'player';
     return {
+      kit: kit,
       size: size,
       name: cleanName_(x && x.name),
       num: s(x.num).replace(/\D/g, '').slice(0, 3),
@@ -234,8 +251,8 @@ function trackOrders(p) {
 
   const ids = {};
   found.forEach(function (r) { ids[r[1]] = []; });
-  const iv = items.getLastRow() > 1 ? items.getRange(2, 1, items.getLastRow() - 1, 5).getValues() : [];
-  iv.forEach(function (r) { if (ids[r[0]]) ids[r[0]].push({ size: String(r[2]), name: String(r[3]), num: String(r[4]) }); });
+  const iv = items.getLastRow() > 1 ? items.getRange(2, 1, items.getLastRow() - 1, 7).getValues() : [];
+  iv.forEach(function (r) { if (ids[r[0]]) ids[r[0]].push({ kit: r[6] === 'GK' ? 'gk' : 'player', size: String(r[2]), name: String(r[3]), num: String(r[4]) }); });
 
   return found.reverse().map(function (r) {
     const status = String(r[COL.status - 1]);
@@ -247,6 +264,14 @@ function trackOrders(p) {
 
 function ss_() {
   return CONFIG.SHEET_ID ? SpreadsheetApp.openById(CONFIG.SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
+}
+
+// เติมหัวคอลัมน์ที่เพิ่มมาใหม่ให้ชีตเดิม (เช่น คอลัมน์ "แบบ")
+function ensureHeaders_(sh, headers) {
+  const cur = sh.getRange(1, 1, 1, headers.length).getValues()[0];
+  headers.forEach(function (h, i) {
+    if (!cur[i]) sh.getRange(1, i + 1).setValue(h).setFontWeight('bold').setBackground('#135e43').setFontColor('#ffeeaa');
+  });
 }
 
 function sheet_(name, headers) {
